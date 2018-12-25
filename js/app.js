@@ -1,46 +1,37 @@
-// Creates list that holds all of the cards and adds event listener to the card deck.
-const allCards = ["diamond","diamond","paper-plane-o","paper-plane-o","bolt","bolt","cube","cube","anchor","anchor","leaf","leaf","bicycle","bicycle","bomb","bomb"];
-
 // Declare and initialize variables with global scope
-const deckLocation = document.querySelector('ul.deck');
+let cardsToCompare = [];
+let movesLeft = 4;
+let movesLeftText = '';
+const allCards = ['diamond','diamond','paper-plane-o','paper-plane-o','bolt','bolt','cube','cube','anchor','anchor','leaf','leaf','bicycle','bicycle','bomb','bomb'];
 
 // Add event listeners for immutable elements
 const restartButton = document.querySelector('.restart');
-restartButton.addEventListener('click', restartGame());
+restartButton.addEventListener('click', restartGame);
 
-// define changin variables in global scope
-let
-  movesLeft = 3,
-  movesLeftText = document.querySelector('.moves'),
-  cardsOpen = 0,
-  newElement,
-  newSubElement;
 restartGame();
 
-// shuffle the card array
-function shuffleArray(array) { // shuffle the list of cards using a custom shuffle function
-  for (var i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+// Restart the game by resetting all relevant game variables.
+function restartGame() {
+  cardsToCompare = [];
+  movesLeft = 4;
+  shuffleDeck();
+  displayMoves();
 }
 /*
-Restart the game by creating a new card deck in the page's HTML.
-The function should execute the following tasks:
 - Create HTML elements and sub (child) elements for each card in the array and add to fragment
 - Assign the appropriate classes and event listeners
 - Replace current HTML .deck elements with newly generated fragment
 */
-function restartGame() {
+function shuffleDeck() {
   const newDeckOrder = shuffleArray(allCards);
+  const deckLocation = document.querySelector('ul.deck');
   const fragment = document.createDocumentFragment();
   for(let i = 0; i < allCards.length; i++) {
-    newElement = document.createElement('li');
-    newElement.className = "card";
+    const newElement = document.createElement('li');
+    newElement.className = 'card';
     newElement.addEventListener('click', cardClick);
-    newSubElement = document.createElement('i');
-    newSubElement.className = "fa fa-" + newDeckOrder[i];
+    const newSubElement = document.createElement('i');
+    newSubElement.className = 'fa fa-' + newDeckOrder[i];
     newElement.appendChild(newSubElement);
     fragment.appendChild(newElement);
   }
@@ -48,68 +39,74 @@ function restartGame() {
     deckLocation.removeChild(deckLocation.firstChild);
   }
   deckLocation.appendChild(fragment); // reflow and repaint
-  console.log(deckLocation);
-  const turnsFailed = document.querySelectorAll('.fa-star-o');
-  turnsFailed.forEach( function(emptyStar) {emptyStar.className = "fa fa-star"});
-  movesLeft = 3;
-  movesLeftText.textContent = ("3 Moves");
 }
 
-function cardClick() { // have been struggling to make this function work well..
-  if (event.target.className == "card") { // only escalate event when card is untouched
-    event.target.className = "card open show";
-    cardsOpen += 1;
-    if (cardsOpen == 2) { // if 2 cards are open, check for match
-      checkMatch();
-      cardsOpen = 0;
-    }
+// shuffle the values in the card array
+function shuffleArray(array) { // shuffle the list of cards using a custom shuffle function
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+// Manages the scoreboard by updating the stars and the moves text
+function displayMoves() {
+  const movesText = (movesLeft == 1) ? ' Move' : ' Moves';
+  movesLeftText = document.querySelector('.moves');
+  movesLeftText.textContent = movesLeft + movesText;
+  const allStars = document.querySelectorAll('.star');
+  allStars.forEach( function(star) { star.className = 'star fa fa-star-o';});
+  for (let i = 0; i < movesLeft; i++) {
+    allStars[i].className = 'star fa fa-star';
   }
 }
-
-
+// Responds to user input when clicked on a card on the deck
+function cardClick(event) {
+  let card = event.target;
+  if (card.className == 'card') { // only escalate event when card is untouched
+    card.className = 'card open show';
+    cardsToCompare.push(card);
+  }
+  if (cardsToCompare.length == 2) { // if 2 cards are open, check for match
+    checkMatch();
+    cardsToCompare = [];
+  }
+}
+// Checks if there is a match
 function checkMatch() {
-  const cardsToCheck = document.querySelectorAll('.open'); // collecting open cards in a nodeList
-  const cardOne = cardsToCheck[0]; // saving card 1 for manipulating card status
-  const cardTwo = cardsToCheck[1]; // saving card 2 for manipulating card status
-  const cardOneChilds = cardOne.childNodes; // saving card 1 childs in a nodeList for checking match
-  const cardTwoChilds = cardTwo.childNodes; // saving card 2 childs in a nodeList for checking match
-  if (cardOneChilds[0].className == cardTwoChilds[0].className) { // if match
-    cardOne.className = cardTwo.className = "card highlight";
-    setTimeout(function() { cardOne.className = cardTwo.className = "card match"; }, 500); // temporarily keeps the card in a highlight position before going to a match position
-    setTimeout(checkForWin, 1000);
-  }
-  else {
-    cardOne.className = cardTwo.className = "card nomatch"; // if no match
-    setTimeout(function() { cardOne.className = cardTwo.className = "card"; }, 1000); // temporarily keeps the card in a no match position before hiding the card again
-    setTimeout(nextTurn, 1000);
+  const cardOne = cardsToCompare[0];
+  const cardTwo = cardsToCompare[1];
+  const cardOneSymbol = cardOne.childNodes[0];
+  const cardTwoSymbol = cardTwo.childNodes[0];
+  if (cardOneSymbol.className == cardTwoSymbol.className) { // if match
+    cardOne.className = 'card highlight';
+    cardTwo.className = 'card highlight';
+    setTimeout(function() { cardOne.className = cardTwo.className = 'card match'; }, 1000); // temporarily keeps the card in a highlight position before going to a match position
+    checkForWin();
+  } else { // if no match
+    cardOne.className = cardTwo.className = 'card nomatch';
+    setTimeout(function() { cardOne.className = cardTwo.className = 'card'; }, 1000); // temporarily keeps the card in a no match position before hiding the card again
+    nextTurn();
   }
 }
-
+// Decrease available moves by 1 and take action if no moves are left
 function nextTurn() {
   movesLeft -= 1;
-  const allScoreCardStars = document.querySelectorAll('.fa-star');
-  allScoreCardStars[movesLeft].className = "fa fa-star-o";
-  if (movesLeft == 2) {
-    movesLeftText.textContent = "2 Moves";
-  }
-  else if (movesLeft == 1) {
-    movesLeftText.textContent = "1 Move";
-  }
-  else if (movesLeft == 0) {
-    movesLeftText.textContent = "0 Moves";
-    setTimeout(gameOver, 0);
+  displayMoves();
+  if (movesLeft == 0) {
+    gameOver();
   }
 }
-
+// Informs the player that the game is over
 function gameOver() {
-  alert("Sorry, game over! Continue to try again");
+  alert('Sorry, game over! Continue to try again');
   restartGame();
 }
-
+// Checks if all cards are matched
 function checkForWin() {
   const cardsMatched = document.querySelectorAll('.match');
   if (cardsMatched.length == 16) {
-    alert("Yeah! You win! You had "+movesLeftText.textContent+" left.");
+    alert('Yeah! You win! You had '+movesLeftText.textContent+' left.');
     restartGame();
   }
 }
