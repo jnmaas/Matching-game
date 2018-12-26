@@ -3,6 +3,10 @@ let cardsToCompare = [];
 let moves = 0;
 let noMatches = 0;
 let stars = 5;
+let seconds = 0;
+let minutes = 0;
+let t;
+let timerText = document.querySelector('.time');
 const allCards = ['diamond','diamond','paper-plane-o','paper-plane-o','bolt','bolt','cube','cube','anchor','anchor','leaf','leaf','bicycle','bicycle','bomb','bomb'];
 
 // Add event listeners for immutable elements
@@ -18,6 +22,8 @@ function restartGame() {
   moves = 0;
   noMatches = 0;
   stars = 5;
+  seconds = 0;
+  minutes = 0;
   shuffleDeck();
   displayScore();
 }
@@ -53,7 +59,7 @@ function shuffleArray(array) { // shuffle the list of cards using a custom shuff
 }
 // Manages the scoreboard by updating the stars and the moves text
 function displayScore() {
-  const movesText = (moves == 1) ? ' Move' : ' Moves';
+  const movesText = (moves == 1) ? ' Move ' : ' Moves';
   const movesLeftText = document.querySelector('.moves');
   movesLeftText.textContent = moves + movesText;
   switch(noMatches) {
@@ -114,10 +120,28 @@ function checkMatch() {
 function checkForWin() {
   const cardsMatched = document.querySelectorAll('.match');
   if (cardsMatched.length == 16) {
-    alert('Yeah! You win! You finished the game in ' + moves + ' moves, with a star rating of ' + stars + ' stars. Want to start again and try to improve your score?');
+    clearTimeout(t);
+    alert('Yeah! You win! Your score: ' + moves + ' moves, ' + stars + ' and a time of ' + timerText.textContent + '. Want to start again and try to improve your score?');
     restartGame();
   }
 }
+
+// shows timer on screen
+function showTimer() {
+  if (seconds >= 60) {
+    seconds = 0;
+    minutes++;
+  }
+  timerText.textContent = (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
+  timer();
+  seconds++;
+}
+
+// updates showTimer every second
+function timer() {
+  t = setTimeout(showTimer, 1000);
+}
+timer();
 
 /*
  * set up the event listener for a card. If a card is clicked:

@@ -100,23 +100,37 @@ h1 {
 
 .score-panel {
     text-align: left;
-    width: 345px;
+    width: 500px;
     margin-bottom: 10px;
 }
 
+.score-panel .score {
+    display: inline-block;
+    width: 300px;
+    float: left;
+}
+
 .score-panel .stars {
+    display: inline-block;
     margin: 0;
     padding: 0;
-    display: inline-block;
     margin: 0 5px 0 0;
 }
 
 .score-panel .stars li {
-    list-style: none;
     display: inline-block;
+    list-style: none;
+}
+
+.score-panel .timer {
+    display: inline-block;
+    width: 100px;
 }
 
 .score-panel .restart {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
     float: right;
     cursor: pointer;
 }
