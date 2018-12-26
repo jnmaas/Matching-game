@@ -1,7 +1,8 @@
 // Declare and initialize variables with global scope
 let cardsToCompare = [];
-let movesLeft = 4;
-let movesLeftText = '';
+let moves = 0;
+let noMatches = 0;
+let stars = 5;
 const allCards = ['diamond','diamond','paper-plane-o','paper-plane-o','bolt','bolt','cube','cube','anchor','anchor','leaf','leaf','bicycle','bicycle','bomb','bomb'];
 
 // Add event listeners for immutable elements
@@ -13,9 +14,11 @@ restartGame();
 // Restart the game by resetting all relevant game variables.
 function restartGame() {
   cardsToCompare = [];
-  movesLeft = 4;
+  moves = 0;
+  noMatches = 0;
+  stars = 5;
   shuffleDeck();
-  displayMoves();
+  displayScore();
 }
 /*
 - Create HTML elements and sub (child) elements for each card in the array and add to fragment
@@ -50,13 +53,30 @@ function shuffleArray(array) { // shuffle the list of cards using a custom shuff
   return array;
 }
 // Manages the scoreboard by updating the stars and the moves text
-function displayMoves() {
-  const movesText = (movesLeft == 1) ? ' Move' : ' Moves';
-  movesLeftText = document.querySelector('.moves');
-  movesLeftText.textContent = movesLeft + movesText;
+function displayScore() {
+  const movesText = (moves == 1) ? ' Move' : ' Moves';
+  const movesLeftText = document.querySelector('.moves');
+  movesLeftText.textContent = moves + movesText;
+  switch(noMatches) {
+  case 4:
+    stars = 4;
+    break;
+  case 6:
+    stars = 3;
+    break;
+  case 8:
+    stars = 2;
+    break;
+  case 10:
+    stars = 1;
+    break;
+  case 12:
+    stars = 0;
+    break;
+  }
   const allStars = document.querySelectorAll('.star');
   allStars.forEach( function(star) { star.className = 'star fa fa-star-o';});
-  for (let i = 0; i < movesLeft; i++) {
+  for (let i = 0; i < stars; i++) {
     allStars[i].className = 'star fa fa-star';
   }
 }
@@ -86,27 +106,22 @@ function checkMatch() {
   } else { // if no match
     cardOne.className = cardTwo.className = 'card nomatch';
     setTimeout(function() { cardOne.className = cardTwo.className = 'card'; }, 1000); // temporarily keeps the card in a no match position before hiding the card again
+    noMatches += 1;
     nextTurn();
   }
 }
 // Decrease available moves by 1 and take action if no moves are left
 function nextTurn() {
-  movesLeft -= 1;
-  displayMoves();
-  if (movesLeft == 0) {
-    gameOver();
-  }
+  moves += 1;
+  displayScore();
 }
-// Informs the player that the game is over
-function gameOver() {
-  alert('Sorry, game over! Continue to try again');
-  restartGame();
-}
+
+
 // Checks if all cards are matched
 function checkForWin() {
   const cardsMatched = document.querySelectorAll('.match');
   if (cardsMatched.length == 16) {
-    alert('Yeah! You win! You had '+movesLeftText.textContent+' left.');
+    alert('Yeah! You win! You finished the game in ' + moves + '!');
     restartGame();
   }
 }
