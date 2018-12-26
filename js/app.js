@@ -8,7 +8,8 @@ const allCards = ['diamond','diamond','paper-plane-o','paper-plane-o','bolt','bo
 // Add event listeners for immutable elements
 const restartButton = document.querySelector('.restart');
 restartButton.addEventListener('click', restartGame);
-
+const deckLocation = document.querySelector('ul.deck');
+deckLocation.addEventListener('click', cardClick);
 restartGame();
 
 // Restart the game by resetting all relevant game variables.
@@ -27,12 +28,10 @@ function restartGame() {
 */
 function shuffleDeck() {
   const newDeckOrder = shuffleArray(allCards);
-  const deckLocation = document.querySelector('ul.deck');
   const fragment = document.createDocumentFragment();
   for(let i = 0; i < allCards.length; i++) {
     const newElement = document.createElement('li');
     newElement.className = 'card';
-    newElement.addEventListener('click', cardClick);
     const newSubElement = document.createElement('i');
     newSubElement.className = 'fa fa-' + newDeckOrder[i];
     newElement.appendChild(newSubElement);
@@ -83,13 +82,15 @@ function displayScore() {
 // Responds to user input when clicked on a card on the deck
 function cardClick(event) {
   let card = event.target;
-  if (card.className == 'card') { // only escalate event when card is untouched
+  if (card.className == 'card') { // only escalate event when it's an untouched card
     card.className = 'card open show';
     cardsToCompare.push(card);
-  }
-  if (cardsToCompare.length == 2) { // if 2 cards are open, check for match
-    checkMatch();
-    cardsToCompare = [];
+    if (cardsToCompare.length == 2) { // if 2 cards are open, check for match
+      checkMatch();
+      cardsToCompare = [];
+      moves += 1;
+      displayScore();
+    }
   }
 }
 // Checks if there is a match
@@ -102,26 +103,18 @@ function checkMatch() {
     cardOne.className = 'card highlight';
     cardTwo.className = 'card highlight';
     setTimeout(function() { cardOne.className = cardTwo.className = 'card match'; }, 1000); // temporarily keeps the card in a highlight position before going to a match position
-    checkForWin();
+    setTimeout(function() { checkForWin(); }, 1000); // waits for classname to be updated and checks for win
   } else { // if no match
     cardOne.className = cardTwo.className = 'card nomatch';
     setTimeout(function() { cardOne.className = cardTwo.className = 'card'; }, 1000); // temporarily keeps the card in a no match position before hiding the card again
     noMatches += 1;
-    nextTurn();
   }
 }
-// Decrease available moves by 1 and take action if no moves are left
-function nextTurn() {
-  moves += 1;
-  displayScore();
-}
-
-
 // Checks if all cards are matched
 function checkForWin() {
   const cardsMatched = document.querySelectorAll('.match');
   if (cardsMatched.length == 16) {
-    alert('Yeah! You win! You finished the game in ' + moves + '!');
+    alert('Yeah! You win! You finished the game in ' + moves + ' moves! Want to start again and try to improve your score?');
     restartGame();
   }
 }
