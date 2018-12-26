@@ -114,7 +114,7 @@ function checkMatch() {
 function checkForWin() {
   const cardsMatched = document.querySelectorAll('.match');
   if (cardsMatched.length == 16) {
-    alert('Yeah! You win! You finished the game in ' + moves + ' moves! Want to start again and try to improve your score?');
+    alert('Yeah! You win! You finished the game in ' + moves + ' moves, with a star rating of ' + stars + ' stars. Want to start again and try to improve your score?');
     restartGame();
   }
 }
