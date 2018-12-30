@@ -1,3 +1,7 @@
+img, embed, object, video {
+  max-width: 100%;
+}
+
 html {
     box-sizing: border-box;
 }
@@ -38,10 +42,7 @@ h1 {
  */
 
 .deck {
-    width: 660px;
-    min-height: 680px;
     background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
-    padding: 32px;
     border-radius: 10px;
     box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
     display: flex;
@@ -52,8 +53,6 @@ h1 {
 }
 
 .deck .card {
-    height: 125px;
-    width: 125px;
     background: #2e3d49;
     font-size: 0;
     color: #ffffff;
@@ -133,4 +132,32 @@ h1 {
     padding: 0;
     float: right;
     cursor: pointer;
+}
+
+
+@media screen and (min-width: 660px) {
+  .deck {
+    width: 660px;
+    min-height: 680px;
+    padding: 32px;
+  }
+  .deck .card {
+    height: 125px;
+    width: 125px;
+  }
+}
+
+
+
+@media screen and (max-width: 659px) {
+  .deck {
+    width: 95%;
+    min-height: auto;
+    padding: 5%;
+  }
+
+  .deck .card {
+    width: 18%;
+    height: auto;
+  }
 }
